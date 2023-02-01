@@ -1,0 +1,1704 @@
+openapi: 3.0.0
+
+info:
+  version: '1.0'
+  title: 'LBAW Re-Event Web API'
+  description: 'Web Resources Specification (A9) for Re-Event'
+
+servers:
+- url: http://lbaw2291.lbaw.fe.up.pt
+  description: Production server
+
+externalDocs:
+  description: Find more info here.
+  url: https://git.fe.up.pt/lbaw/lbaw2223/lbaw2291/-/wikis/home
+
+tags:
+  - name: 'M01: Authentication and User Profile'
+  - name: 'M02: Events'
+  - name: 'M03: Event Participation and Ownership'
+  - name: 'M04: Review and Comment'
+  - name: 'M05: Invitations'
+  - name: 'M06: Administration'
+  - name: 'M07: Static Pages'
+
+paths:
+
+  /login:
+    get:
+      operationId: R101
+      summary: 'R101: Login Form'
+      description: 'Form page that allows user login. Access: PUB'
+      tags:
+        - 'M01: Authentication and User Profile'
+      responses:
+        '200':
+          description: 'Ok. Show log-in UI'
+    post:
+      operationId: R102
+      summary: 'R102: Login Action'
+      description: 'Web resource that verifies user input in order to perform authentication. Access: PUB'
+      tags:
+        - 'M01: Authentication and User Profile'
+
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:          # <!--- form field name
+                  type: string
+                password:    # <!--- form field name
+                  type: string
+              required:
+                - email
+                - password
+
+      responses:
+        '302':
+          description: 'Redirect after processing the login credentials.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful authentication. Redirect to home page.'
+                  value: '/home'
+                302Error:
+                  description: 'Failed authentication. Redirect to login form.'
+                  value: '/login'
+
+  /logout:
+
+    post:
+      operationId: R103
+      summary: 'R103: Logout Action'
+      description: 'Web resource that logs out the user. Access: AUTH, ADM'
+      tags:
+        - 'M01: Authentication and User Profile'
+      responses:
+        '302':
+          description: 'Redirect after processing logout.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful logout. Redirect to login form.'
+                  value: '/login'
+
+  /register:
+    get:
+      operationId: R104
+      summary: 'R104: Register Form'
+      description: 'Form page that allows user to register themselves into the application. Access: PUB'
+      tags:
+        - 'M01: Authentication and User Profile'
+      responses:
+        '200':
+          description: 'Ok. Show register UI'
+
+    post:
+      operationId: R105
+      summary: 'R105: Register Action'
+      description: 'This web resource register the user into the system, processing the new user registration form submission. Access: PUB'
+      tags:
+        - 'M01: Authentication and User Profile'
+
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                birthdate:
+                  type: string
+                  format: date
+                gender:
+                  type: string
+                password:
+                  type: string
+                password_confirmation:
+                  type: string
+                picture:
+                  type: string
+                  format: binary
+              required:
+                - name
+                - email
+                - birthdate
+                - password
+                - password_confirmation
+
+      responses:
+        '302':
+          description: 'Redirect after processing the new user information.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful authentication. Redirect to home page.'
+                  value: '/home'
+                302Failure:
+                  description: 'Failed authentication. Redirect to register form.'
+                  value: '/register'
+
+  /user{id}:
+    get:
+      operationId: R106
+      summary: 'R106: View user profile page.'
+      description: 'Shows the individual user profile page, which includes a form to edit profile details, and a menu with options to view and manage events. Access: AUTH, ADM'
+      tags:
+        - 'M01: Authentication and User Profile'
+
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+
+      responses:
+        '200':
+          description: 'Ok. Show view profile UI'
+
+  /updateUser/{id}:
+
+    post:
+        operationId: R107
+        summary: 'R107: Edit Profile Action'
+        description: 'This web resource allows the user to change its user profile information. Access: AUTH, ADM'
+        tags:
+          - 'M01: Authentication and User Profile'
+
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  birthdate:
+                    type: string
+                    format: date
+                  password:
+                    type: string
+                  gender:
+                    type: string
+                  picture:
+                    type: string
+                    format: binary
+                required:
+                  - name
+                  - email
+                  - birthdate
+                  - gender
+
+        responses:
+          '302':
+            description: 'Redirect after processing the updated user information.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful update. Redirect to user page.'
+                    value: '/user{id}'
+                  302Failure:
+                    description: 'Failed update. Redirect to same user page.'
+                    value: '/user{id}'
+
+  /deleteUser:
+
+    post:
+        operationId: R108
+        summary: 'R108: Delete User Action'
+        description: 'This web resource allows the user to delete their own profile or admin to delete user profiles. Access: AUTH, OWN, ADM'
+        tags:
+          - 'M01: Authentication and User Profile'
+
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: integer
+                required:
+                  - userid
+
+        responses:
+          '302':
+            description: 'Redirect after processing the delete user information.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful delete. Redirect to home page (now unauthenticated).'
+                    value: '/home'
+                  302Failure:
+                    description: 'Failed delete. Redirect to same user page.'
+                    value: '/user{id}'
+          '400':
+            description: 'Bad Request.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Redirect to the same user page'
+                    value: '/user{id}'      
+
+  /forgot-password:
+
+    get:
+      operationId: R109
+      summary: 'R109: Forgot Password Form'
+      description: 'Form page that allows user to ask for a forgot password email. Access: PUB'
+      tags:
+        - 'M01: Authentication and User Profile'
+      responses:
+        '200':
+          description: 'Ok. Show forgot password UI'
+    post:
+        operationId: R110
+        summary: 'R110: Forgot Password Action'
+        description: 'This web resource allows the user to ask for an email to reset their password. Access: AUTH, OWN'
+        tags:
+          - 'M01: Authentication and User Profile'
+
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: integer
+                required:
+                  - userid
+
+        responses:
+          '302':
+            description: 'Redirect after the successful email sent.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful reset email sent. Redirect to home page (now unauthenticated).'
+                    value: '/home'
+                  302Failure:
+                    description: 'Unsuccessful reset email sent. Redirect to the same form.'
+                    value: '/forgot-password'
+          '400':
+            description: 'Bad Request.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Redirect to the same form.'
+                    value: '/forgot-password'                
+
+  /reset-password:
+
+    get:
+      operationId: R111
+      summary: 'R111: Reset Password Form'
+      description: 'Form page that allows user to reset their password. Access: OWN'
+      tags:
+        - 'M01: Authentication and User Profile'
+      responses:
+        '200':
+          description: 'Ok. Show reset password password UI'
+
+    post:
+        operationId: R112
+        summary: 'R112: Reset Password Action'
+        description: 'This web resource allows the user to reset their password on the system. Access: AUTH, OWN'
+        tags:
+          - 'M01: Authentication and User Profile'
+
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: integer
+                required:
+                  - userid
+
+        responses:
+          '302':
+            description: 'Redirect after resetting th user password.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful reset. Redirect to home page (now unauthenticated).'
+                    value: '/home'
+                  302Failure:
+                    description: 'Unsuccessful reset. Redirect to the same form.'
+                    value: '/reset-password{token}'
+          '400':
+            description: 'Bad Request.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Redirect to the same form.'
+                    value: '/reset-password{token}'  
+
+#M02 - Events
+
+  /home:
+
+    get:
+      operationId: R201
+      summary: 'R201: Home Page'
+      description: 'Displays highlighted events and other eventse . Access: PUB'
+      tags:
+        - 'M02: Events'
+
+      responses:
+        '200':
+          description: 'Ok. Show homepage UI.'
+
+  /search:
+
+    get:
+      operationId: R202
+      summary: 'R202: Search events'
+      description: 'Search events based on name or description via an UI. Access: PUB'
+      tags:
+        - 'M02: Events'
+      responses:
+        '200':
+          description: 'Ok. Show search results modal UI.'
+
+    post:
+      operationId: R203
+      summary: 'R203: Search events'
+      description: 'Search events based on name or description. Access: PUB'
+      tags:
+        - 'M02: Events'
+      parameters:
+        - in: path
+          name: query_string
+          schema:
+            type: string
+          required: true
+      responses:
+        '302':
+          description: 'Redirect after processing the search query.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful search. Redirect to search results page.'
+                  value: '/search'
+                302Failure:
+                  description: 'Failed search. Redirect to home page.'
+                  value: '/home'
+
+  /event{id}:
+
+    get:
+      operationId: R204
+      summary: 'R204: Event page'
+      description: 'Displays a page with info about an Event. Access: PUB'
+      tags:
+        - 'M02: Events'
+      responses:
+        '200':
+          description: 'Ok. Show event details page.'
+
+  /createEvent:
+    get:
+      operationId: R205
+      summary: 'R205: Create event form'
+      description: 'Displays the UI for creating a new event. Access: AUTH'
+      tags:
+        - 'M02: Events'
+      responses:
+        '200':
+          description: 'Ok. Show event creation page.'
+
+
+  /storeEvent:
+    post:
+        operationId: R206
+        summary: 'R206: Create Event Action'
+        description: 'This web resource allows the user to change its user profile information. Access: AUTH, OWN'
+        tags:
+          - 'M02: Events'
+
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  date:
+                    type: string
+                    format: date
+                  capacity:
+                    type: integer
+                  city:
+                    type: string
+                  country:
+                    type: string
+                  price:
+                    type: number
+                    format: float
+                  address:
+                    type: string
+                  tag:
+                    type: string
+                  image:
+                    type: string
+                    format: binary
+                required:
+                  - name
+                  - description
+                  - date
+                  - capacity
+                  - city
+                  - country
+                  - price
+                  - address
+                  - tag
+
+        responses:
+          '302':
+            description: 'Redirect after processing the new event information.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to new event page.'
+                    value: '/event{id}'
+                  302Failure:
+                    description: 'Failed. Redirect to same create event page.'
+                    value: '/createEvent'
+          '400':
+            description: 'Bad Request. Event not created.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Event not created. Redirect to the same create event page.'
+                    value: '/createEvent'
+
+  /editEvent{id}:
+    get:
+      operationId: R207
+      summary: 'R207: View event edit page with edit event form'
+      description: 'Show the event information available to edit. Access: AUTH, OWN'
+      tags:
+        - 'M02: Events'
+
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+
+      responses:
+        '200':
+          description: 'Ok. Show edit event UI'
+
+  /updateEvent:
+
+    post:
+        operationId: R208
+        summary: 'R208: Update Event Action'
+        description: 'This web resource allows the user that is the owner of an event to update its event information. Access: AUTH, OWN, ADM'
+        tags:
+          - 'M02: Events'
+
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  date:
+                    type: string
+                    format: date
+                  capacity:
+                    type: integer
+                  city:
+                    type: string
+                  country:
+                    type: string
+                  price:
+                    type: number
+                    format: float
+                  address:
+                    type: string
+                  tag:
+                    type: string
+                  image:
+                    type: string
+                    format: binary
+                required:
+                  - name
+                  - description
+                  - date
+                  - capacity
+                  - city
+                  - country
+                  - price
+                  - address
+                  - tag
+
+        responses:
+          '302':
+            description: 'Redirect after processing the updated user information.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful authentication. Redirect to user page.'
+                    value: '/user{id}'
+                  302Failure:
+                    description: 'Failed authentication. Redirect to same user page.'
+                    value: '/user{id}'
+          '400':
+            description: 'Bad Request. User not updated.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'User not updated. Redirect to the same user.'
+                    value: '/user{id}'
+
+
+  /deleteEvent:
+
+    post:
+        operationId: R209
+        summary: 'R209: Delete Event Action'
+        description: 'This web resource allows to delete an event. Access: AUTH, OWN, ADM'
+        tags:
+          - 'M02: Events'
+
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  eventid:
+                    type: integer
+                required:
+                  - eventid
+        responses:
+          '302':
+            description: 'Success'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to the home page.'
+                    value: '/home'
+                  302Failure:
+                    description: 'Failed. Redirect to same event page.'
+                    value: '/event{eventid}'
+          '404':
+            description: 'Not Found. Event not found.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  404:
+                    description: 'Event not found. Redirect to the same event page.'
+                    value: '/event{eventid}'
+          '400':
+            description: 'Bad Request. Event not deleted.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Event not deleted. Redirect to the same event page.'
+                    value: '/event{eventid}'
+
+#M03 - Event Participation and Ownership
+
+  /attendEvent:
+
+    #exclusively used get in this resource for simplicity, as it is not a security risk
+
+    post:
+      operationId: R301
+      summary: 'R301: Participate in event'
+      description: 'Allows a user to participate in an event. Access: AUTH'
+      tags:
+        - 'M03: Event Participation and Ownership'
+
+      requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  eventid:
+                    type: integer
+                  userid:
+                    type: integer
+                required:
+                  - eventid
+                  - userid
+
+      responses:
+        '302':
+          description: 'Success'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful. Redirect to the event page.'
+                  value: '/event{id}'
+                302Failure:
+                  description: 'Failed. Redirect to same event page.'
+                  value: '/event{id}'
+        '400':
+          description: 'Bad Request.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                400:
+                  description: 'Bad request. Redirect to the same event page.'
+                  value: '/event{id}'
+
+  /leaveEvent:
+
+    post:
+      operationId: R302
+      summary: 'R302: Unparticipate in event'
+      description: 'Allows a user to unparticipate in an event. Access: AUTH'
+      tags:
+        - 'M03: Event Participation and Ownership'
+
+      requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  eventid:
+                    type: integer
+                  userid:
+                    type: integer
+                required:
+                  - eventid
+                  - userid
+
+      responses:
+        '302':
+          description: 'Success'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful. Redirect to the user page.'
+                  value: '/user{id}'
+                302Failure:
+                  description: 'Failed. Redirect to same event page.'
+                  value: '/event{id}'
+        '400':
+          description: 'Bad Request.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                400:
+                  description: 'Bad request. Redirect to the same event page.'
+                  value: '/event{id}'
+
+  /addEventUsers:
+
+      post:
+        operationId: R303
+        summary: 'R303: Add user to an event'
+        description: 'Allows an event owner to add an user to an event. Access: AUTH, OWN'
+        tags:
+          - 'M03: Event Participation and Ownership'
+
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  eventid:
+                    type: integer
+                  userid:
+                    type: integer
+                required:
+                  - eventid
+                  - userid
+
+        responses:
+          '302':
+            description: 'Success'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to the user page with the events managed.'
+                    value: '/user{id}'
+                  302Failure:
+                    description: 'Failed. Redirect to the user page with the events managed.'
+                    value: '/user{id}'
+          '400':
+            description: 'Bad Request.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Redirect to the user page with the events managed.'
+                    value: '/user{id}'
+
+  /removeEventUsers:
+
+    #exclusively used get in this resource for simplicity, as it is not a security risk
+
+    post:
+      operationId: R304
+      summary: 'R304: Remove user from an event'
+      description: 'Allows an event owner to remove an user from an event. Access: AUTH, OWN'
+      tags:
+        - 'M03: Event Participation and Ownership'
+
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  eventid:
+                    type: integer
+                  userid:
+                    type: integer
+                required:
+                  - eventid
+                  - userid
+
+      responses:
+        '302':
+          description: 'Success'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful. Redirect to the user page with the events managed.'
+                  value: '/user{id}'
+                302Failure:
+                  description: 'Failed. Redirect to the user page with the events managed.'
+                  value: '/user{id}'
+        '400':
+          description: 'Bad Request.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                400:
+                  description: 'Bad request. Redirect to the user page with the events managed.'
+                  value: '/user{id}'
+
+  /transferOwnership:
+
+    post:
+      operationId: R305
+      summary: 'R305: Transfer the ownership of an event'
+      description: 'Allows an event owner to remove an tranfer the ownership of an event to another user. Access: OWN'
+      tags:
+        - 'M03: Event Participation and Ownership'
+
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  eventid:
+                    type: integer
+                  userid:
+                    type: integer
+                required:
+                  - eventid
+                  - userid
+
+      responses:
+        '302':
+          description: 'Success'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                302Success:
+                  description: 'Successful. Redirect to the user of the event ehich ownership was transfered.'
+                  value: '/event{eventid}'
+                302Failure:
+                  description: 'Failed.  Redirect to the page of the event ehich ownership was to be transfered.'
+                  value: '/event{eventid}'
+        '400':
+          description: 'Bad Request.'
+          headers:
+            Location:
+              schema:
+                type: string
+              examples:
+                400:
+                  description: 'Bad request. Redirect to the page of the event ehich ownership was to be transfered.'
+                  value: '/event{eventid}'
+
+#M04 - Review and Comment
+
+  /storeComment:
+    
+        post:
+          operationId: R401
+          summary: 'R401: Comment event'
+          description: 'Allows a user to comment an event. Access: AUTH'
+          tags:
+            - 'M04: Review and Comment'
+          requestBody:
+                    required: true
+                    content:
+                      application/x-www-form-urlencoded:
+                        schema:
+                          type: object
+                          properties:
+                            eventid:
+                              type: integer
+                            userid:
+                              type: integer
+                            comment:
+                              type: string
+                          required:
+                            - eventid
+                            - userid
+                            - comment         
+    
+          responses:
+            '302':
+              description: 'Success'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    302Success:
+                      description: 'Successful. Redirect to the event page.'
+                      value: '/event{eventid}'
+                    302Failure:
+                      description: 'Failed. Redirect to same event page.'
+                      value: '/event{eventid}'
+            '404':
+              description: 'Not Found. Event not found.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    404:
+                      description: 'Event not found. Redirect to the home page.'
+                      value: '/home'
+            '400':
+              description: 'Bad Request. Comment not processed.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    400:
+                      description: 'Bad request. Comment not processed. Redirect to the same event page.'
+                      value: '/event{eventid}'
+
+  /deleteComment:
+    
+        post:
+          operationId: R402
+          summary: 'R402: Delete a comment from an event'
+          description: 'Allows a user to delete a comment from an event. Access: AUTH, OWN'
+          tags:
+            - 'M04: Review and Comment'
+          requestBody:
+                    required: true
+                    content:
+                      application/x-www-form-urlencoded:
+                        schema:
+                          type: object
+                          properties:
+                            eventid:
+                              type: integer
+                            userid:
+                              type: integer
+                            comment:
+                              type: string
+                          required:
+                            - commentid 
+                            - userid  
+                            - eventid        
+
+          responses:
+            '302':
+              description: 'Success'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    302Success:
+                      description: 'Successful. Redirect to the event page.'
+                      value: '/event{eventid}'
+                    302Failure:
+                      description: 'Failed. Redirect to same event page.'
+                      value: '/event{eventid}'
+            '404':
+              description: 'Not Found. Event not found.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    404:
+                      description: 'Event not found. Redirect to the home page.'
+                      value: '/home'
+            '400':
+              description: 'Bad Request. Could not delete comment.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    400:
+                      description: 'Bad request. Could not delete comment. Redirect to the same event page.'
+                      value: '/event{eventid}'
+
+  /addUpvote:
+    
+        post:
+          operationId: R403
+          summary: 'R403: Upvote comment'
+          description: 'Allows a user to upvote a comment in an event. Access: AUTH'
+          tags:
+            - 'M04: Review and Comment'
+          requestBody:
+                    required: true
+                    content:
+                      application/x-www-form-urlencoded:
+                        schema:
+                          type: object
+                          properties:
+                            commentid:
+                              type: integer
+                            userid:
+                              type: integer
+                          required:
+                            - commentid
+                            - userid      
+    
+          responses:
+            '302':
+              description: 'Success'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    302Success:
+                      description: 'Successful. Redirect to the event page.'
+                      value: '/event{eventid}'
+                    302Failure:
+                      description: 'Failed. Redirect to same event page.'
+                      value: '/event{eventid}'
+            '404':
+              description: 'Not Found. Event not found.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    404:
+                      description: 'Event not found. Redirect to the home page.'
+                      value: '/home'
+            '400':
+              description: 'Bad Request. Upvote not processed.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    400:
+                      description: 'Bad request. Upvote in comment not processed. Redirect to the same event page.'
+                      value: '/event{eventid}'
+
+  /deleteUpvote:
+    
+        post:
+          operationId: R404
+          summary: 'R404: Delete an upvote from a comment'
+          description: 'Allows a user to delete an upvote from a comment. Access: AUTH, OWN'
+          tags:
+            - 'M04: Review and Comment'
+          requestBody:
+                    required: true
+                    content:
+                      application/x-www-form-urlencoded:
+                        schema:
+                          type: object
+                          properties:
+                            commentid:
+                              type: integer
+                            userid:
+                              type: integer
+                          required:
+                            - commentid 
+                            - userid         
+
+          responses:
+            '302':
+              description: 'Success'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    302Success:
+                      description: 'Successful. Redirect to the event page.'
+                      value: '/event{eventid}'
+                    302Failure:
+                      description: 'Failed. Redirect to same event page.'
+                      value: '/event{eventid}'
+            '404':
+              description: 'Not Found. Event not found.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    404:
+                      description: 'Event not found. Redirect to the home page.'
+                      value: '/home'
+            '400':
+              description: 'Bad Request. Could not delete upvote.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    400:
+                      description: 'Bad request. Could not delete upvote. Redirect to the same event page.'
+                      value: '/event{eventid}'
+
+  /getComments:
+    
+        post:
+          operationId: R405
+          summary: 'R405: Get all comments for an event'
+          description: 'Retrieves all comments from an event. Access: AUTH'
+          tags:
+            - 'M04: Review and Comment'
+          requestBody:
+                    required: true
+                    content:
+                      application/x-www-form-urlencoded:
+                        schema:
+                          type: object
+                          properties:
+                            eventid:
+                              type: integer
+                          required:
+                            - eventid      
+
+          responses:
+            '200':
+              description: 'Success'
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      userid:
+                        type: integer
+                      username:
+                        type: string
+                      comment:
+                        type: string
+                      upvotes:
+                        type: integer
+            '404':
+              description: 'Not Found. Event not found.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    404:
+                      description: 'Event not found. Redirect to the home page.'
+                      value: '/home'
+            '400':
+              description: 'Bad Request. Could not get comments.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    400:
+                      description: 'Bad request. Could not get comments. Redirect to the home page'
+                      value: '/home'
+
+  /storeReport:
+    
+        post:
+          operationId: R406
+          summary: 'R406: Report a comemnt'
+          description: 'Stores information about the report of a comment by a user. Access: AUTH'
+          tags:
+            - 'M04: Review and Comment'
+          requestBody:
+                    required: true
+                    content:
+                      application/x-www-form-urlencoded:
+                        schema:
+                          type: object
+                          properties:
+                            commentid:
+                              type: integer
+                            reason:
+                              type: string
+                            description:
+                              type: string
+                            
+                          required:
+                            - commentid
+                            - reason    
+                            - description
+
+          responses:
+            '302':
+              description: 'Success'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    302Success:
+                      description: 'Successful. Redirect to the event page.'
+                      value: '/event{eventid}'
+                    302Failure:
+                      description: 'Failed. Redirect to same event page.'
+                      value: '/event{eventid}'
+            '404':
+              description: 'Not Found. Event not found.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    404:
+                      description: 'Event not found. Redirect to the home page.'
+                      value: '/home'
+            '400':
+              description: 'Bad Request. Could not process report.'
+              headers:
+                Location:
+                  schema:
+                    type: string
+                  examples:
+                    400:
+                      description: 'Bad request. Could not process report. Redirect to the same event page'
+                      value: '/event{eventid}'
+
+
+#M05 - Invitations
+
+  /invite:
+
+      post:
+        operationId: R501
+        summary: 'R501: Invite user to event action'
+        description: 'Allows to an invitation to be sent. Access: AUTH'
+        tags:
+          - 'M05: Invitations'
+        requestBody:
+                  required: true
+                  content:
+                    application/x-www-form-urlencoded:
+                      schema:
+                        type: object
+                        properties:
+                          invited_user:
+                            type: string
+                          eventid:
+                            type: integer
+                        required:
+                          - invited_user
+                          - eventid
+
+        responses:
+          '302':
+            description: 'Success'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to the event page.'
+                    value: '/event{id}'
+                  302Failure:
+                    description: 'Failed. Redirect to same event page.'
+                    value: '/event{id}'
+          '404':
+            description: 'Not Found. Event not found.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  404:
+                    description: 'Event not found. Redirect to the home page.'
+                    value: '/home'
+          '400':
+            description: 'Bad Request. Invitation not processed.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Invitation not processed. Redirect to the same event page.'
+                    value: '/event{id}'
+
+  /inviteAccept:
+
+      post:
+        operationId: R502
+        summary: 'R502: Accept invitation to event action'
+        description: 'Allows an invitation to be marked as accepted. Access: AUTH'
+        tags:
+          - 'M05: Invitations'
+        requestBody:
+                  required: true
+                  content:
+                    application/x-www-form-urlencoded:
+                      schema:
+                        type: object
+                        properties:
+                          inviter_userid:
+                            type: integer
+                          eventid:
+                            type: integer
+                        required:
+                          - inviter_userid
+                          - eventid
+
+        responses:
+          '302':
+            description: 'Success'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to the event page.'
+                    value: '/event{id}'
+                  302Failure:
+                    description: 'Failed. Redirect to the user page.'
+                    value: '/user{id}'
+          '404':
+            description: 'Not Found. Event not found.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  404:
+                    description: 'Event not found. Redirect to the home page.'
+                    value: '/home'
+          '400':
+            description: 'Bad Request. Invitation accept not processed.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Invitation accept not processed. Redirect to the same event page.'
+                    value: '/event{id}'
+
+  /inviteReject:
+
+      post:
+        operationId: R503
+        summary: 'R503: Reject invitation to event action'
+        description: 'Allows an invitation to be marked as rejected. Access: AUTH'
+        tags:
+          - 'M05: Invitations'
+        requestBody:
+                  required: true
+                  content:
+                    application/x-www-form-urlencoded:
+                      schema:
+                        type: object
+                        properties:
+                          inviter_userid:
+                            type: integer
+                          eventid:
+                            type: integer
+                        required:
+                          - inviter_userid
+                          - eventid
+
+        responses:
+          '302':
+            description: 'Success'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to the event page.'
+                    value: '/event{id}'
+                  302Failure:
+                    description: 'Failed. Redirect to the user page.'
+                    value: '/user{id}'
+          '404':
+            description: 'Not Found. Event not found.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  404:
+                    description: 'Event not found. Redirect to the home page.'
+                    value: '/home'
+          '400':
+            description: 'Bad Request. Invitation reject not processed.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Invitation reject not processed. Redirect to the same event page.'
+                    value: '/event{id}'
+
+  /numberNotifications:
+
+      post:
+        operationId: R504
+        summary: 'R504: Updates the number of notifications of a user'
+        description: 'Allows to update the number of new notifications the user has. Access: AUTH, ADM'
+        tags:
+          - 'M05: Invitations'
+        requestBody:
+                  required: true
+                  content:
+                    application/x-www-form-urlencoded:
+                      schema:
+                        type: object
+
+        responses:
+          '302':
+            description: 'Success'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to the home page.'
+                    value: '/home'
+                  302Failure:
+                    description: 'Failed. Redirect to the home page.'
+                    value: '/home'
+          '404':
+            description: 'Not Found. User not found.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  404:
+                    description: 'User not found. Redirect to the home page.'
+                    value: '/home'
+          '400':
+            description: 'Bad Request. Notifications number update not processed.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Notifications number update not processed. Redirect to the home page.'
+                    value: '/home'
+
+  /clearNotifications:
+
+      post:
+        operationId: R505
+        summary: 'R505: Updates the read status of notifications of a user'
+        description: 'Allows to update the read status of the notifications of a user. Access: AUTH, ADM'
+        tags:
+          - 'M05: Invitations'
+        requestBody:
+                  required: true
+                  content:
+                    application/x-www-form-urlencoded:
+                      schema:
+                        type: object
+
+        responses:
+          '302':
+            description: 'Success'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to the home page.'
+                    value: '/home'
+                  302Failure:
+                    description: 'Failed. Redirect to the home page.'
+                    value: '/home'
+          '404':
+            description: 'Not Found. User not found.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  404:
+                    description: 'User not found. Redirect to the home page.'
+                    value: '/home'
+          '400':
+            description: 'Bad Request. Set notifications read status not processed.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Set notifications read status not processed. Redirect to the home page.'
+                    value: '/home'
+
+#M06/M07 - Administration and static pages
+
+  /admin/users:
+
+    get:
+      operationId: R601
+      summary: 'R601: Admin - Users'
+      description: 'Allows an admin to view the users page. Access: ADM'
+      tags:
+        - 'M06: Administration'
+
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userid:
+                    type: integer
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  birthdate:
+                    type: string
+                    format: date
+                  address:
+                    type: string
+                  gender:
+                    type: string
+                  profilepic:
+                    type: string
+                  isadmin:
+                    type: boolean
+
+  /changeBlockStatus:
+
+      post:
+        operationId: R602
+        summary: 'R602: Block/unblock user'
+        description: 'Allows to update the block status of a user. Access: ADM'
+        tags:
+          - 'M06: Administration'
+        requestBody:
+                  required: true
+                  content:
+                    application/x-www-form-urlencoded:
+                      schema:
+                        type: object
+                        properties:
+                          userid:
+                            type: integer
+                          eventid:
+                            type: integer
+                        required:
+                          - userid
+
+        responses:
+          '302':
+            description: 'Success'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  302Success:
+                    description: 'Successful. Redirect to the current user (admin) page.'
+                    value: '/user{id}'
+                  302Failure:
+                    description: 'Failed. Redirect to the current user (admin) page.'
+                    value: '/user{id}'
+          '404':
+            description: 'Not Found. User not found.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  404:
+                    description: 'User not found. Redirect to the current user (admin) page.'
+                    value: '/user{id}'
+          '400':
+            description: 'Bad Request. Block/unblock user not processed.'
+            headers:
+              Location:
+                schema:
+                  type: string
+                examples:
+                  400:
+                    description: 'Bad request. Block/unblock user not processed. Redirect to the current user (admin) page.'
+                    value: '/user{id}'
+
+
+  /aboutUs:
+    get:
+      operationId: R701
+      summary: 'R701: About Us'
+      description: 'Allows a user to view the about us page. Access: PUB'
+      tags:
+        - 'M07: Static Pages'
+
+      responses:
+        '200':
+          description: 'Ok. Show About Us UI.'
+
+  /faq:
+    get:
+      operationId: R702
+      summary: 'R702: FAQ'
+      description: 'Allows a user to view the FAQ page. Access: PUB'
+      tags:
+        - 'M07: Static Pages'
+
+      responses:
+        '200':
+          description: 'Ok. Show FAQ UI.'
+
+  /contactUs:
+    get:
+      operationId: R703
+      summary: 'R703: Contact Us'
+      description: 'Allows a user to view the contact us page. Access: PUB'
+      tags:
+        - 'M07: Static Pages'
+
+      responses:
+        '200':
+          description: 'Ok. Show contacts UI.'
+
+

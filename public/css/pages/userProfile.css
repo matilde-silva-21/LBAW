@@ -1,0 +1,540 @@
+.userProfile {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    position: relative;
+    padding: 0px 30px 30px 30px;
+
+}
+
+@media screen and (max-width:800px) {
+    .userProfile {
+        flex-direction: column;
+    }
+}
+
+.profileAndDetails {
+    width: 22vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 30px 0px 30px 0px;
+    margin: 30px;
+    /* background-color: black; */
+
+}
+
+@media screen and (max-width:800px) {
+    .profileAndDetails {
+        width: 100%;
+        margin: 0;
+    }
+}
+
+#profileUserCard {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 30px 0px 30px 0px;
+    /* background-color: azure; */
+}
+
+#profileUserCard>img {
+    border-radius: 5%;
+    width: 8rem;
+    height: 8rem;
+    border: 1px solid black;
+    left: -10px;
+}
+
+#profileUserCard>* {
+    margin: 0 0.5em;
+}
+
+#selectOptions {
+    /* background-color: red; */
+    display: flex;
+    flex-direction: column;
+    row-gap: 18px;
+    width: 240px;
+}
+
+.option {
+    cursor: pointer;
+}
+
+.option {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.submenuActive {
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.submenuSleep {
+    display: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.details.submenuActive {
+    position: absolute;
+    top: 10%;
+    left: 18%;
+    height: 100vh;
+    width: 100rem;
+    z-index: 1;
+}
+
+#selectDetails {
+    width: 100%;
+}
+
+.optionSelected {
+    border-bottom: 2px solid black;
+    font-weight: bold;
+}
+
+.option::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #000;
+    transition: .3s;
+}
+
+.option:hover::after {
+    width: 100%;
+    transition: .3s;
+}
+
+.subOption::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #000;
+    transition: .3s;
+}
+
+.subOption:hover::after {
+    width: 100%;
+    transition: .3s;
+}
+
+.subOption {
+    list-style-type: none;
+    margin: 17px 0px 17px 0px;
+}
+
+.optionDetails {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 0px 30px 0px;
+}
+
+.optionDetailsHidden {
+    display: none;
+}
+
+#profileDetailsForm {
+    width: 100%;
+}
+
+#myProfileDetails button:first-of-type {
+    margin-left: 80%;
+}
+
+#del_account {
+    position: relative;
+    width: 10rem;
+    top: -2.3rem;
+    right: 15rem;
+}
+
+.updateProfileInputBoxes {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 40%;
+}
+
+.updateProfileInputBoxes>label {
+    size: 0.6rem;
+}
+
+.updateProfileInputBoxes>input {
+    margin: 10px 0px 0px 0px
+}
+
+.updateProfileInputBoxes>input:focus-visible {
+    background-color: none;
+    border-color: none;
+    outline: none !important;
+
+}
+
+.updateProfileDetailsRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 5px 0 40px;
+
+}
+
+.updateProfileTextInput>input {
+    background-color: transparent;
+    border: 0;
+    border-bottom: 2px solid black;
+}
+
+.overlay {
+    overflow-x: hidden;
+    /* Disable horizontal scroll */
+    transition: 0.5s;
+}
+
+.events-list {
+    width: 100%;
+    font-size: 0.9em;
+}
+
+.events-list tr td {
+    padding: 5px 20px 10px 10px;
+}
+
+.events-list tr:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.events-list tr:nth-child(even) {
+
+    background-color: rgba(202, 160, 229, 0.7);
+    color: #000;
+}
+
+.events-list tr td:last-child {
+    padding: 5px 0;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 1rem 0;
+    align-items: center;
+}
+
+.events-list tr td:last-child p {
+    margin: 0;
+}
+
+#viewReports .events-list tr:hover {
+    background-color: rgba(168, 240, 87, 0.7);
+    color: #000;
+}
+
+.events-list tr td:last-child img {
+    width: 24px;
+}
+
+.events-list tr td:last-child button {
+    display: flex;
+    height: fit-content;
+}
+
+.events-list tr:hover .event-date {
+    border-left: 5px solid #4f8db3;
+}
+
+
+.events-list .event-date {
+    margin: 3px 0;
+    padding: 2px 10px;
+    border-left: 5px solid #CFCFCF;
+    -webkit-transition: all .25s linear;
+    -moz-transition: all .25s linear;
+    -o-transition: all .25s linear;
+    -ms-transition: all .25s linear;
+    transition: all .25s linear;
+}
+
+.events-list .event-date .event-day {
+    color: #004A5B;
+    font-size: 1.2em;
+    font-weight: 600;
+    text-align: left;
+}
+
+.events-list .event-date .event-month {
+    color: #777;
+    font-size: 1em;
+    font-weight: 600;
+    text-align: left;
+}
+
+.events-list .event-date .event-venue,
+.events-list .event-date {
+    white-space: nowrap;
+}
+
+.btn-edit-event {
+    margin-right: 2rem;
+    z-index: 2;
+}
+
+#edit-modal-content {
+    /* CONTAINER */
+    height: 80vh;
+    width: 90rem;
+    position: absolute;
+    left: -30rem;
+    top: -3rem;
+    overflow: hidden;
+}
+
+
+div.form-event-edit {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-gap: 5px;
+}
+
+#editModal form {
+    display: table;
+}
+
+div.form-event-edit {
+    display: table-row;
+}
+
+div.form-event-edit label {
+    display: table-cell;
+}
+
+div.form-event-edit input {
+    display: table-cell;
+    width: 25rem;
+    padding-top: 0.5rem;
+    margin-top: 1rem;
+}
+
+div.form-event-edit:first-child {
+    margin-top: 5rem;
+}
+
+div#preview-container {
+    position: absolute;
+    bottom: 37rem;
+    left: 37em;
+    display: inline-block;
+}
+
+div#preview-container #preview-image {
+    position: absolute;
+    top: -2rem;
+    width: 50rem;
+    height: 33rem;
+    border-radius: 5%;
+}
+
+#preview-container #preview-name {
+    position: absolute;
+    top: -1rem;
+    left: 1.5rem;
+    text-align: left;
+    width: 50rem;
+
+    background: linear-gradient(-45deg, #414119, #ff8f2f, #ff554d, #eb1267);
+    background-size: 300%;
+    font-size: 3rem;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: zee 7s linear infinite;
+
+    z-index: 1 !important;
+}
+
+@keyframes zee {
+    0% {
+        background-position: 0px 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0px 50%;
+    }
+}
+
+
+#preview-container h3 {
+    position: absolute;
+    top: 3rem;
+    left: 1.7rem;
+    font-size: 1.5rem;
+    text-align: left;
+    color: white;
+}
+
+#preview-container button.btn {
+    position: absolute;
+    top: 2rem;
+    left: 42rem;
+    text-align: left;
+}
+
+#preview-container ul#menu-info {
+    position: absolute;
+    top: 27.5rem;
+    left: 6rem;
+}
+
+#teste-form button {
+    width: 10rem;
+    left: 20.5rem;
+}
+
+.single-post-title h2 {
+    display: inline-block;
+}
+
+.single-post-title button {
+    margin-left: 48rem;
+}
+
+.single-post-content {
+    padding: 0 4rem 0 0;
+}
+
+.option .numberNotification {
+    padding: 5px 10px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+}
+
+.optionText {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.option p {
+    margin: 0;
+    padding: 0;
+}
+
+#createUserModal form div.form-group {
+    margin: 0 auto;
+    width: 30.5rem;
+}
+
+#createUserModal form button {
+    margin-left: 8.6rem;
+    width: 30.5rem;
+    margin-top: 1rem;
+}
+
+#createUserModal div.modal-content {
+    height: 80vh;
+    width: 50rem;
+    position: relative;
+    left: 50%;
+    top: 20rem;
+    transform: translate(-50%, -50%);
+}
+
+#createEventModal div.modal-content {
+    height: 90vh !important;
+
+}
+
+#createEventModal div.modal-body {
+    overflow-y: auto;
+    max-height: calc(90vh - 150px) !important;
+}
+
+tbody tr {
+    border-bottom: 1px solid whitesmoke;
+    border-top: 1px solid whitesmoke;
+}
+
+/* css select every td element except last child */
+tbody tr td:not(:last-child) {
+    border-right: 1px solid whitesmoke;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap");
+
+
+.comment-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    height: 20rem;
+}
+
+.comment-container img {
+    position: absolute;
+    width: 9rem;
+    height: 9rem;
+    border-radius: 5%;
+    top: 1rem;
+    left: 1rem;
+}
+
+.comment-container h4.name {
+    position: absolute;
+    top: 1rem;
+    left: 12rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+
+.comment-container p.text {
+    position: absolute;
+    top: 7rem;
+    left: 12rem;
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+.comment-container ul {
+    position: absolute;
+    top: 13rem;
+    left: 1rem;
+    font-size: 1rem;
+    font-weight: 300;
+    text-align: left;
+}
+.div1 {
+    grid-area: 1 / 1 / 3 / 3;
+}
+
+.div2 {
+    grid-area: 1 / 3 / 2 / 6;
+}
+
+.div3 {
+    grid-area: 2 / 3 / 3 / 6;
+}
+
+.div4 {
+    grid-area: 3 / 1 / 6 / 6;
+}
